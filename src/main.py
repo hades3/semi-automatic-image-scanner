@@ -1,10 +1,12 @@
 import cv2
 import numpy as np
 
-img = cv2.imread('../resources/tarot_card.jpg')
+img = cv2.imread('../resources/number_card.jpg')
 points = []
 POINT_COLOR = (255, 0, 0)
 POINT_RADIUS = 5
+WIDTH = 480
+HEIGHT = 640
 
 
 def mouse_handler(event, x, y, flags, param):
@@ -21,7 +23,21 @@ def mouse_handler(event, x, y, flags, param):
     for point in points:
         cv2.circle(img_copy, point, POINT_RADIUS, POINT_COLOR, cv2.FILLED)
 
+    if len(points) == 4:
+        show_result()
+        points.clear()
+        return
+
     cv2.imshow('img', img_copy)
+
+
+def show_result():
+    src = np.float32(points)
+    dst = np.float32(np.array([[0, 0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT]]))
+
+    matrix = cv2.getPerspectiveTransform(src, dst)  # 변환행렬
+    result = cv2.warpPerspective(img, matrix, (WIDTH, HEIGHT))
+    cv2.imshow('result', result)
 
 
 cv2.namedWindow('img')
